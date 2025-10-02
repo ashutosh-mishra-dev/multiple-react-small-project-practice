@@ -1,13 +1,21 @@
 //import { legacy_createStore as createStore} from 'redux'
-import { createStore } from "redux";
+import { combineReducers, createStore } from "redux";
 
-const initialState = {
+//------------------------ initial State for Account  ----------------------------------
+const initialStateAccount = {
   balance: 0,
   loan: 0,
   loanPurpose: "",
 };
 
-function reducer(state = initialState, action) {
+//------------------------ initial State for customer  ----------------------------------
+const initialStateCustomer = {
+  fullName: "",
+  nationalID: "",
+  createdAt: "",
+};
+//------------------------ accounts  reducer  start ----------------------------------
+function aacountReducer(state = initialStateAccount, action) {
   switch (action.type) {
     case "account/deposite":
       return { ...state, balance: state.balance + action.payload };
@@ -32,8 +40,32 @@ function reducer(state = initialState, action) {
       return state;
   }
 }
+//------------------------ accounts  reducer  end ----------------------------------
 
-const store = createStore(reducer);
+//------------------------ customer  reducer  start ----------------------------------
+function customerReducer(state = initialStateCustomer, action) {
+  switch (action.type) {
+    case "customer/createCustomer":
+      return {
+        ...state,
+        fullName: action.payload.fullName,
+        nationalID: action.payload.nationalID,
+        createdAt: action.payload.createdAt,
+      };
+    default:
+      return state;
+  }
+}
+//------------------------ customer  reducer  end ----------------------------------
+
+// here we create root reducer for multiple reducer
+const rootReducer = combineReducers({
+  account: aacountReducer,
+  customer: customerReducer,
+});
+
+// Aapke app ke jitne bhi data / states hain (account, customer etc.) wo sab ek hi central jagah (store) me rehte hain.
+const store = createStore(rootReducer);
 
 // store.dispatch({ type: "account/deposite", payload: 500 });
 // console.log("deposite : ", store.getState());
@@ -50,6 +82,7 @@ const store = createStore(reducer);
 // store.dispatch({ type: "account/payLoan", payload: 100 });
 // console.log("payLoan : ", store.getState());
 
+//------------------------ accounts all method for reducer  start ----------------------------------
 function deposite(amount) {
   return { type: "account/deposite", payload: amount };
 }
@@ -73,4 +106,23 @@ store.dispatch(deposite(500));
 store.dispatch(withdraw(200));
 store.dispatch(requestLoan(1000, "Buy a car"));
 store.dispatch(payLoan());
+
+//------------------------ account all method for reducer end ----------------------------------
+
+//------------------------ customer all method for reducer start ----------------------------------
+function createCustomer(fullName, nationalID) {
+  return {
+    type: "customer/createCustomer",
+    payload: { fullName, nationalID, createdAt: new Date().toDateString() },
+  };
+}
+
+function updateName(fullName) {
+  return { type: "customer/updateName", payload: fullName };
+}
+
+store.dispatch(createCustomer("Krishna mishra", "adhar card"));
+store.dispatch(updateName("Krishna mishra"));
 console.log(store.getState());
+
+//------------------------ customer all method for reducer end ----------------------------------
