@@ -2,12 +2,17 @@ const initialStateAccount = {
   balance: 0,
   loan: 0,
   loanPurpose: "",
+  isLoading: false,
 };
 
 export default function aacountReducer(state = initialStateAccount, action) {
   switch (action.type) {
     case "account/deposite":
-      return { ...state, balance: state.balance + action.payload };
+      return {
+        ...state,
+        balance: state.balance + action.payload,
+        isLoading: false,
+      };
     case "account/withdraw":
       return { ...state, balance: state.balance - action.payload };
     case "account/requestLoan":
@@ -25,13 +30,32 @@ export default function aacountReducer(state = initialStateAccount, action) {
         balance: state.balance - state.loan,
       };
 
+    case "account/convertingCurrency":
+      return { ...state, isLoading: true };
+
     default:
       return state;
   }
 }
 
-export function deposite(amount) {
-  return { type: "account/deposite", payload: amount };
+export function deposite(amount, currency) {
+  if (currency === "INR") return { type: "account/deposite", payload: amount };
+
+  // middleware for convert currency
+  return async function (dispatch, getState) {
+    //API call
+    dispatch({ type: "account/convertingCurrency" });
+    const res = await fetch(
+      `https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=INR`
+    );
+
+    const data = await res.json();
+    const convertedAmount = data.rates.INR;
+    //console.log(converted);
+
+    // return action
+    dispatch({ type: "account/deposite", payload: convertedAmount });
+  };
 }
 
 export function withdraw(amount) {
