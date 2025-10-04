@@ -5,7 +5,7 @@ const initialStateAccount = {
   isLoading: false,
 };
 
-export default function aacountReducer(state = initialStateAccount, action) {
+export default function acountReducer(state = initialStateAccount, action) {
   switch (action.type) {
     case "account/deposite":
       return {
@@ -43,8 +43,8 @@ export function deposite(amount, currency) {
 
   // middleware for convert currency
   return async function (dispatch, getState) {
-    //API call
     dispatch({ type: "account/convertingCurrency" });
+    //API call
     const res = await fetch(
       `https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=INR`
     );
