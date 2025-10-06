@@ -14,6 +14,7 @@ const accountSlice = createSlice({
   reducers: {
     deposite(state, action) {
       state.balance += action.payload;
+      state.isLoading = false;
     },
     withdraw(state, action) {
       state.balance -= action.payload;
@@ -33,17 +34,39 @@ const accountSlice = createSlice({
       },
     },
 
-    payLoan(state, action) {
+    payLoan(state) {
       state.balance -= state.loan;
       state.loan = 0;
       state.loanPurpose = "";
     },
+    convertingCurrency(state) {
+      state.isLoading = true;
+    },
   },
 });
 
-console.log(accountSlice);
-export const { deposite, withdraw, requestLoan, payLoan } =
-  accountSlice.actions;
+export const { withdraw, requestLoan, payLoan } = accountSlice.actions;
+
+export function deposite(amount, currency) {
+  if (currency === "INR") return { type: "account/deposite", payload: amount };
+
+  // middleware for convert currency
+  return async function (dispatch, getState) {
+    dispatch({ type: "account/convertingCurrency" });
+    //API call
+    const res = await fetch(
+      `https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=INR`
+    );
+
+    const data = await res.json();
+    const convertedAmount = data.rates.INR;
+    //console.log(converted);
+
+    // return action
+    dispatch({ type: "account/deposite", payload: convertedAmount });
+  };
+}
+
 export default accountSlice.reducer;
 
 //------------------------ here we are writen code mordern RTK close -----------------------------------------
