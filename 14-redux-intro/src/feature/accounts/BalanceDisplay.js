@@ -1,4 +1,4 @@
-import { connect, useSelector } from "react-redux";
+import { connect } from "react-redux";
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("en", {
@@ -7,11 +7,8 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-// mordern way to connect react to redux and get data/state form redux reducer
+// mordern way to connect react to redux and get data/state from redux reducer
 //function BalanceDisplay() {
-
-//const account = useSelector((store) => store.account);
-
 //const { balance: currencyBalance } = useSelector((store) => store.account);
 
 //return <div className="balance">{formatCurrency(currencyBalance)}</div>;

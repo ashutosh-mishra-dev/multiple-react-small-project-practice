@@ -9,6 +9,7 @@ function AccountOperations() {
   const [loanPurpose, setLoanPurpose] = useState("");
   const [currency, setCurrency] = useState("INR");
 
+  // ye ek hook hai esi ka use karke ham yha se action ko pass karte hai
   const dispatch = useDispatch();
   const {
     loan: currentLoan,
@@ -20,9 +21,10 @@ function AccountOperations() {
 
   function handleDeposit() {
     if (!depositAmount) return;
-    dispatch(deposite(depositAmount, currency));
+    //dispatch(deposite(depositAmount, currency));
+    dispatch(deposite(depositAmount));
     setDepositAmount("");
-    setCurrency("");
+    setCurrency("INR");
   }
 
   function handleWithdrawal() {
